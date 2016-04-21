@@ -1,0 +1,21 @@
+<object>
+	<name></name>
+	<pose></pose>
+	<truncated></truncated>
+	<difficult></difficult>
+	<bndbox>
+		<xmin></xmin>
+		<ymin></ymin>
+		<xmax></xmax>
+		<ymax></ymax>
+	</bndbox>
+    <vbndbox>
+		<xmin></xmin>
+		<ymin></ymin>
+		<xmax></xmax>
+		<ymax></ymax>
+	</vbndbox>
+    <occ></occ>
+    <ign></ign>
+    <ang></ang>
+</object>

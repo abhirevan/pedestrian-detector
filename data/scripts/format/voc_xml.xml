@@ -1,0 +1,15 @@
+<annotation>
+    <folder></folder>
+    <filename></filename>
+    <source>
+        <database></database>
+        <annotation></annotation>
+        <image></image>
+    </source>
+    <size>
+        <width></width>
+        <height></height>
+        <depth></depth>
+    </size>
+    <segmented></segmented>
+</annotation>
