@@ -1,8 +1,8 @@
 import os
 import shutil
 
-SRC_FOLDER = "/raid/ashanbhag3/personal/data/images"
-DEST_FOLDER = "/raid/ashanbhag3/personal/data/target_images"
+SRC_FOLDER = "/home/abhijitcbim/data/PedDetectionIMDB/images"
+DEST_FOLDER = "/home/abhijitcbim/data/PedDetectionIMDB/target_images"
 
 
 def splitall(path):

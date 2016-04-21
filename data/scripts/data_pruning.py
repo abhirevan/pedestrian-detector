@@ -2,8 +2,8 @@ import os
 
 __author__ = "abhirevan"
 
-XML_FOLDER = "/raid/ashanbhag3/personal/data/annotations"
-DEST_FOLDER = "/raid/ashanbhag3/personal/data/annotations-xml"
+XML_FOLDER = "/home/abhijitcbim/data/PedDetectionIMDB/annotations"
+DEST_FOLDER = "/home/abhijitcbim/data/PedDetectionIMDB/annotations-xml"
 
 
 def remove_first_line(filename):

@@ -2,9 +2,9 @@ import os
 import pandas as pd
 import xml.etree.cElementTree as ET
 
-XML_FOLDER = "/raid/ashanbhag3/personal/data/annotations"
-DEST_FOLDER = "/raid/ashanbhag3/personal/data/annotations_xml"
-ROOT_FOLDER = "/raid/ashanbhag3/personal/data/"
+XML_FOLDER = "/home/abhijitcbim/data/PedDetectionIMDB/annotations"
+DEST_FOLDER = "/home/abhijitcbim/data/PedDetectionIMDB/annotations_xml"
+ROOT_FOLDER = "/home/abhijitcbim/data/PedDetectionIMDB"
 
 
 def splitall(path):
@@ -140,4 +140,5 @@ def convert_to_csv(folder):
 
 
 if __name__ == '__main__':
+    convert_to_csv(XML_FOLDER)
     convert_to_xml(XML_FOLDER)
