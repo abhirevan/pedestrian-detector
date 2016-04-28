@@ -7,6 +7,8 @@ import xml.etree.ElementTree as ET
 
 from datasets.imdb import imdb
 
+from voc_eval import voc_eval
+
 __author__ = "abhirevan"
 
 
@@ -15,6 +17,7 @@ class PedestrianDataset(imdb):
         imdb.__init__(self, image_set)
         self._image_set = image_set
         self._devkit_path = devkit_path
+        print "self._devkit_path:", self._devkit_path
         self._data_path = os.path.join(self._devkit_path, 'data')
         self._classes = ('__background__', 'person', 'people', 'person-fa', 'person?')
         self._class_to_ind = dict(zip(self.classes, xrange(self.num_classes)))
@@ -22,7 +25,13 @@ class PedestrianDataset(imdb):
         self._image_index = self._load_image_set_index()
         self._salt = str(uuid.uuid4())
         self._comp_id = 'comp4'
-
+        # PASCAL specific config options
+        self.config = {'cleanup': True,
+                       'use_salt': True,
+                       'use_diff': False,
+                       'matlab_eval': False,
+                       'rpn_file': None,
+                       'min_size': 2}
         assert os.path.exists(self._devkit_path), \
             'VOCdevkit path does not exist: {}'.format(self._devkit_path)
         assert os.path.exists(self._data_path), \
@@ -135,6 +144,17 @@ class PedestrianDataset(imdb):
             filename)
         return path
 
+    def _get_voc_results_file_template(self):
+        # VOCdevkit/results/VOC2007/Main/<comp_id>_det_test_aeroplane.txt
+        filename = self._get_comp_id() + '_det_' + self._image_set + '_{:s}.txt'
+        path = os.path.join(
+            self._devkit_path,
+            'results',
+            'Semantic',
+            'Main',
+            filename)
+        return path
+
     def _write_ped_results_file(self, all_boxes):
         for cls_ind, cls in enumerate(self.classes):
             if cls == '__background__':
@@ -150,6 +170,55 @@ class PedestrianDataset(imdb):
                         f.write('{:s} {:.5f} {:.1f} {:.1f} {:.1f} {:.1f}\n'.
                                 format(index, dets[k, -1], dets[k, 0], dets[k, 1], dets[k, 2], dets[k, 3]))
 
-    def evaluate_detections(self, all_boxes, output_dir=None):
+    def _do_python_eval(self, output_dir='output'):
+        # annopath = os.path.join(self._devkit_path, 'VOC' + self._year, 'Annotations', '{:s}.xml')
+        annopath = os.path.join(self._data_path, 'Annotations', '{:s}.xml')
+        print "annopath:", annopath
+        # imagesetfile = os.path.join(self._devkit_path, 'VOC' + self._year, 'ImageSets', 'Main',
+        #                            self._image_set + '.txt')
+        imagesetfile = os.path.join(self._data_path, 'ImageSets', 'Main', self._image_set + '.txt')
+        print "imagesetfile:", imagesetfile
+        cachedir = os.path.join(self._devkit_path, 'annotations_cache')
+        aps = []
+        # The PASCAL VOC metric changed in 2010
+        use_07_metric = True  # if int(self._year) < 2010 else False
+        print 'VOC07 metric? ' + ('Yes' if use_07_metric else 'No')
+        if not os.path.isdir(output_dir):
+            os.mkdir(output_dir)
+        for i, cls in enumerate(self._classes):
+            if cls == '__background__':
+                continue
+            filename = self._get_voc_results_file_template().format(cls)
+            rec, prec, ap = voc_eval(
+                filename, annopath, imagesetfile, cls, cachedir, ovthresh=0.5,
+                use_07_metric=use_07_metric)
+            aps += [ap]
+            print('AP for {} = {:.4f}'.format(cls, ap))
+            with open(os.path.join(output_dir, cls + '_pr.pkl'), 'w') as f:
+                cPickle.dump({'rec': rec, 'prec': prec, 'ap': ap}, f)
+        print('Mean AP = {:.4f}'.format(np.mean(aps)))
+        print('~~~~~~~~')
+        print('Results:')
+        for ap in aps:
+            print('{:.3f}'.format(ap))
+        print('{:.3f}'.format(np.mean(aps)))
+        print('~~~~~~~~')
+        print('')
+        print('--------------------------------------------------------------')
+        print('Results computed with the **unofficial** Python eval code.')
+        print('Results should be very close to the official MATLAB eval code.')
+        print('Recompute with `./tools/reval.py --matlab ...` for your paper.')
+        print('-- Thanks, The Management')
+        print('--------------------------------------------------------------')
+
+    def evaluate_detections(self, all_boxes, output_dir):
         self._write_ped_results_file(all_boxes)
-        print "Proposals stored in " + self._get_ped_results_file_template().format("table")
+        self._do_python_eval(output_dir)
+        if self.config['matlab_eval']:
+            self._do_matlab_eval(output_dir)
+        if self.config['cleanup']:
+            for cls in self._classes:
+                if cls == '__background__':
+                    continue
+                filename = self._get_voc_results_file_template().format(cls)
+                os.remove(filename)

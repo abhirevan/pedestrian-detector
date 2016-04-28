@@ -4,10 +4,10 @@
 # Written by Bharath Hariharan
 # --------------------------------------------------------
 
-import xml.etree.ElementTree as ET
-import os
-import cPickle
 import numpy as np
+import os
+import xml.etree.ElementTree as ET
+
 
 def parse_rec(filename):
     """ Parse a PASCAL VOC xml file """
@@ -17,8 +17,8 @@ def parse_rec(filename):
         obj_struct = {}
         obj_struct['name'] = obj.find('name').text
         obj_struct['pose'] = obj.find('pose').text
-        obj_struct['truncated'] = int(obj.find('truncated').text)
-        obj_struct['difficult'] = int(obj.find('difficult').text)
+        obj_struct['truncated'] = 0
+        obj_struct['difficult'] = 0
         bbox = obj.find('bndbox')
         obj_struct['bbox'] = [int(bbox.find('xmin').text),
                               int(bbox.find('ymin').text),
@@ -27,6 +27,7 @@ def parse_rec(filename):
         objects.append(obj_struct)
 
     return objects
+
 
 def voc_ap(rec, prec, use_07_metric=False):
     """ ap = voc_ap(rec, prec, [use_07_metric])
@@ -60,6 +61,7 @@ def voc_ap(rec, prec, use_07_metric=False):
         # and sum (\Delta recall) * prec
         ap = np.sum((mrec[i + 1] - mrec[i]) * mpre[i + 1])
     return ap
+
 
 def voc_eval(detpath,
              annopath,
@@ -101,7 +103,14 @@ def voc_eval(detpath,
     with open(imagesetfile, 'r') as f:
         lines = f.readlines()
     imagenames = [x.strip() for x in lines]
-
+    # load annots
+    recs = {}
+    for i, imagename in enumerate(imagenames):
+        recs[imagename] = parse_rec(annopath.format(imagename))
+        if i % 100 == 0:
+            print 'Reading annotation for {:d}/{:d}'.format(
+                i + 1, len(imagenames))
+    '''
     if not os.path.isfile(cachefile):
         # load annots
         recs = {}
@@ -118,7 +127,7 @@ def voc_eval(detpath,
         # load
         with open(cachefile, 'r') as f:
             recs = cPickle.load(f)
-
+    '''
     # extract gt objects for this class
     class_recs = {}
     npos = 0
