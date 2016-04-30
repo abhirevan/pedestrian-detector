@@ -217,10 +217,10 @@ class PedestrianDataset(imdb):
         results = self._do_python_eval(output_dir)
         if self.config['matlab_eval']:
             self._do_matlab_eval(output_dir)
-        if self.config['cleanup']:
-            for cls in self._classes:
-                if cls == '__background__':
-                    continue
-                filename = self._get_voc_results_file_template().format(cls)
-                os.remove(filename)
+
+        for cls in self._classes:
+            if cls == '__background__':
+                continue
+            filename = self._get_voc_results_file_template().format(cls)
+            print filename
         return results

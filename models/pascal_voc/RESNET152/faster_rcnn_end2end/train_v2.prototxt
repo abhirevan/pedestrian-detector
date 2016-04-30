@@ -8,7 +8,7 @@ layer {
   python_param {
     module: 'roi_data_layer.layer'
     layer: 'RoIDataLayer'
-    param_str: "'num_classes': @#@#"
+    param_str: "'num_classes': 5"
   }
 }
 layer {
@@ -6486,7 +6486,7 @@ layer {
   python_param {
     module: 'rpn.proposal_target_layer'
     layer: 'ProposalTargetLayer'
-    param_str: "'num_classes': @#@#"
+    param_str: "'num_classes': 5"
   }
 }
 
@@ -6957,7 +6957,7 @@ layer {
     lr_mult: 2
   }
   inner_product_param {
-    num_output: @#@#
+    num_output: 5
     weight_filler {
       type: "gaussian"
       std: 0.01
@@ -6980,7 +6980,7 @@ layer {
     lr_mult: 2
   }
   inner_product_param {
-    num_output: !$!$
+    num_output: 20
     weight_filler {
       type: "gaussian"
       std: 0.001
@@ -7009,5 +7009,5 @@ layer {
   bottom: "bbox_inside_weights"
   bottom: "bbox_outside_weights"
   top: "loss_bbox"
-  loss_weight: 2
+  loss_weight: 1
 }
