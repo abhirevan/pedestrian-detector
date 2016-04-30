@@ -134,6 +134,9 @@ class PedestrianDataset(imdb):
     def _get_comp_id(self):
         return self._comp_id + '_' + self._salt
 
+    def _set_comp_id(self, comp_id):
+        self._comp_id = comp_id
+
     def _get_ped_results_file_template(self):
         filename = self._get_comp_id() + '_det_' + self._image_set + '_{:s}.txt'
         path = os.path.join(
@@ -212,7 +215,7 @@ class PedestrianDataset(imdb):
         print('~~~~~~~~')
         return results
 
-    def evaluate_detections(self, all_boxes, output_dir):
+    def evaluate_detections(self, all_boxes, output_dir, proposal_prefix=None):
         self._write_ped_results_file(all_boxes)
         results = self._do_python_eval(output_dir)
         if self.config['matlab_eval']:

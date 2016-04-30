@@ -18,6 +18,23 @@ import argparse
 import pprint
 import time, os, sys
 
+
+def splitall(path):
+    allparts = []
+    while 1:
+        parts = os.path.split(path)
+        if parts[0] == path:  # sentinel for absolute paths
+            allparts.insert(0, parts[0])
+            break
+        elif parts[1] == path:  # sentinel for relative paths
+            allparts.insert(0, parts[1])
+            break
+        else:
+            path = parts[0]
+            allparts.insert(0, parts[1])
+    return allparts
+
+
 def parse_args():
     """
     Parse input arguments
@@ -57,6 +74,7 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+
 if __name__ == '__main__':
     args = parse_args()
 
@@ -87,4 +105,10 @@ if __name__ == '__main__':
     if not cfg.TEST.HAS_RPN:
         imdb.set_proposal_method(cfg.TEST.PROPOSAL_METHOD)
 
-    test_net(net, imdb, max_per_image=args.max_per_image, vis=args.vis)
+    n, _ = os.path.splitext(args.caffemodel)
+    paths = splitall(n)
+
+    proposal_prefix = paths[-1]
+    print proposal_prefix
+
+    test_net(net, imdb, max_per_image=args.max_per_image, vis=args.vis, proposal_prefix=proposal_prefix)
