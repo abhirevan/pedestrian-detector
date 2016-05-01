@@ -23,7 +23,8 @@ for year in ['2007', '2012']:
 
 # setup PedDetector
 ped_dataset_path = os.getcwd() + "/data/PedestrianImage"
-for split in ['test', 'train','test_small','trainfull']:
+for split in ['test', 'train', 'test_small', 'trainfull', 'far_scale', 'medium_scale', 'near_scale', 'no_occ',
+              'partial_occ', 'heavy_occ']:
     name = 'ped_{}'.format(split)
     __sets[name] = (lambda split=split: PedestrianDataset(split, ped_dataset_path))
 

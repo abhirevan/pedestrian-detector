@@ -20,6 +20,22 @@ import time, os, sys
 import pandas as pd
 
 
+def splitall(path):
+    allparts = []
+    while 1:
+        parts = os.path.split(path)
+        if parts[0] == path:  # sentinel for absolute paths
+            allparts.insert(0, parts[0])
+            break
+        elif parts[1] == path:  # sentinel for relative paths
+            allparts.insert(0, parts[1])
+            break
+        else:
+            path = parts[0]
+            allparts.insert(0, parts[1])
+    return allparts
+
+
 def parse_args():
     """
     Parse input arguments
@@ -43,7 +59,7 @@ def parse_args():
                         default='experiments/cfgs/faster_rcnn_end2end.yml', type=str)
     parser.add_argument('--res', dest='res_file',
                         help='result file',
-                        default='', type=str,required=True)
+                        default='', type=str, required=True)
     args = parser.parse_args()
     return args
 
@@ -70,17 +86,22 @@ def run_test_net(gpu_id, caffemodel, prototxt, imdb_name, cfg_file):
     if not cfg.TEST.HAS_RPN:
         imdb.set_proposal_method(cfg.TEST.PROPOSAL_METHOD)
 
-    return test_net(net, imdb, max_per_image=100, vis=False)
+    n, _ = os.path.splitext(args.caffemodel)
+    paths = splitall(n)
+
+    proposal_prefix = paths[-1]
+
+    return test_net(net, imdb, max_per_image=100, vis=False, proposal_prefix=proposal_prefix)
 
 
-def run_test_nets(gpu_id, dir, model_files, prototxt, imdb_name, cfg_file,res_file):
+def run_test_nets(gpu_id, dir, model_files, prototxt, imdb_name, cfg_file, res_file):
     models = [line.rstrip('\n') for line in open(os.path.join(dir, model_files))]
     df_results = pd.DataFrame()
     for model in models:
         results = run_test_net(gpu_id, os.path.join(dir, model), prototxt, imdb_name, cfg_file)
         for result in results:
             result['file'] = model
-        df_results = df_results.append(results,ignore_index =True)
+        df_results = df_results.append(results, ignore_index=True)
 
     df_results.to_csv(os.path.join(dir, res_file))
 
@@ -97,6 +118,6 @@ if __name__ == '__main__':
     print('Called with args:')
     print(args)
 
-    run_test_nets(args.gpu_id, args.dir, args.model_files, args.prototxt, args.imdb_name, args.cfg_file,args.res_file)
+    run_test_nets(args.gpu_id, args.dir, args.model_files, args.prototxt, args.imdb_name, args.cfg_file, args.res_file)
 
     # run_test_net(gpu_id,caffemodel, prototxt, imdb_name, cfg_file)

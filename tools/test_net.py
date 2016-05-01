@@ -109,6 +109,5 @@ if __name__ == '__main__':
     paths = splitall(n)
 
     proposal_prefix = paths[-1]
-    print proposal_prefix
 
-    test_net(net, imdb, max_per_image=args.max_per_image, vis=args.vis, proposal_prefix=proposal_prefix)
+    test_net(net, imdb, max_per_image=args.max_per_image, vis=args.vis, proposal_prefix=proposal_prefix,thresh=0.5)

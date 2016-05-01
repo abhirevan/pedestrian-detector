@@ -176,11 +176,9 @@ class PedestrianDataset(imdb):
     def _do_python_eval(self, output_dir='output'):
         # annopath = os.path.join(self._devkit_path, 'VOC' + self._year, 'Annotations', '{:s}.xml')
         annopath = os.path.join(self._data_path, 'Annotations', '{:s}.xml')
-        print "annopath:", annopath
         # imagesetfile = os.path.join(self._devkit_path, 'VOC' + self._year, 'ImageSets', 'Main',
         #                            self._image_set + '.txt')
         imagesetfile = os.path.join(self._data_path, 'ImageSets', 'Main', self._image_set + '.txt')
-        print "imagesetfile:", imagesetfile
         cachedir = os.path.join(self._devkit_path, 'annotations_cache')
         aps = []
         # The PASCAL VOC metric changed in 2010
